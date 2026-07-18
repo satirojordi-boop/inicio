@@ -88,5 +88,10 @@
     "nombre": "ChatGPT",
     "url": "https://chat.openai.com",
     "icono": "🌐"
+  },
+  {
+    "nombre": "la taberna del cangrejo",
+    "url": "https://www.latabernadelcangrejo.eu/forum.php",
+    "icono": "🌐"
   }
 ]
