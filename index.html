@@ -118,6 +118,7 @@
 <script>
 let SITIOS = [];
 const RUTA = "sitios.json";
+const WORKER_URL = "https://guardar-sitios.satiro-jordi.workers.dev";
 
 function reloj(){
   const n = new Date();
@@ -175,11 +176,16 @@ function render(lista){
 }
 
 function guardar(lista){
-  // Guarda en localStorage de este navegador (persiste al recargar en ESTE PC)
-  try { localStorage.setItem('sitios_inicio', JSON.stringify(SITIOS)); } catch(e){}
+  if(WORKER_URL && WORKER_URL.indexOf("PEGAR")===-1){
+    fetch(WORKER_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({sitios:SITIOS})})
+      .then(r=>{ if(!r.ok) throw new Error("worker "+r.status); })
+      .then(()=>console.log("Sitios guardados vía Worker:", SITIOS.length))
+      .catch(err=>alert("No se pudo guardar: "+err.message));
+  } else {
+    console.log("WORKER_URL no configurada; cambios solo en memoria.");
+  }
   render(SITIOS);
-  if(typeof handleCambio==='function') handleCambio();
-  console.log('Sitios actualizados:', SITIOS.length);
 }
 
 function buscar(e){
@@ -188,12 +194,11 @@ function buscar(e){
   if(q) window.open('https://search.brave.com/search?q='+encodeURIComponent(q),'_blank');
 }
 
-// Cargar sitios: prioriza localStorage (cambios del "+" en este PC), si no, sitios.json
-try {
-  const loc = localStorage.getItem('sitios_inicio');
-  if(loc){ SITIOS = JSON.parse(loc); render(SITIOS); }
-  else { fetch(RUTA).then(r=>r.ok?r.json():[]).then(l=>{ SITIOS=l; render(SITIOS); }).catch(()=>render([])); }
-} catch(e){ fetch(RUTA).then(r=>r.ok?r.json():[]).then(l=>{ SITIOS=l; render(SITIOS); }).catch(()=>render([])); }
+// Cargar sitios desde sitios.json (GitHub)
+fetch(RUTA)
+  .then(r=>r.ok ? r.json() : [])
+  .then(lista=>{ SITIOS = lista; render(SITIOS); })
+  .catch(()=>{ SITIOS = []; render(SITIOS); });
 
 // Clima Manresa (Open-Meteo, sin API key) con icono gráfico
 const W = document.getElementById('weather');
