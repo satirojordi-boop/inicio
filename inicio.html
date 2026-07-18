@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inicio</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; font-family:"Segoe UI",system-ui,sans-serif; color:#fff; }
+  body {
+    background: linear-gradient(135deg, #5b2bd6 0%, #7b3be0 30%, #b14bff 65%, #ff4b6b 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh; overflow:hidden;
+  }
+  .grid {
+    display:grid; grid-template-columns:repeat(10,minmax(96px,1fr));
+    gap:18px; width:min(1040px,96vw); margin-bottom:34px;
+    transform:translateY(-80px);
+  }
+  .search {
+    width:min(620px,86vw); display:flex; background:rgba(255,255,255,0.16);
+    backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.3);
+    border-radius:40px; padding:12px 22px; margin-bottom:18px;
+  }
+  .clock {
+    text-align:center; text-shadow:0 2px 12px rgba(0,0,0,0.35);
+  }
+  .clock .time { font-size:72px; font-weight:300; letter-spacing:2px; }
+  .clock .date { font-size:18px; opacity:0.9; margin-top:4px; }
+  .search input {
+    flex:1; background:transparent; border:none; outline:none; color:#fff;
+    font-size:18px;
+  }
+  .search input::placeholder { color:rgba(255,255,255,0.7); }
+  .tile {
+    background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.25);
+    border-radius:16px; padding:14px 8px; text-align:center; cursor:pointer;
+    transition:transform .12s, background .12s; text-decoration:none; color:#fff;
+    position:relative;
+  }
+  .tile:hover { transform:translateY(-4px); background:rgba(255,255,255,0.26); }
+  .tile .emoji { font-size:34px; display:block; }
+  .tile .fav { width:40px; height:40px; display:block; margin:0 auto; object-fit:contain; }
+  .tile .name { font-size:13px; margin-top:8px; opacity:0.95; word-break:break-word; }
+  .tile .del {
+    position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%;
+    background:#ff4b6b; border:none; color:#fff; font-size:13px; cursor:pointer; display:none;
+  }
+  .tile .edit {
+    position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%;
+    background:#ffd24b; border:none; color:#222; font-size:12px; cursor:pointer; display:none;
+  }
+  .tile:hover .del, .tile:hover .edit { display:block; }
+  .add {
+    background:rgba(255,255,255,0.22); border:2px dashed rgba(255,255,255,0.5);
+    display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:200;
+  }
+  .add:hover { background:rgba(255,255,255,0.34); }
+  .weather {
+    position:fixed; left:22px; top:75%; transform:translateY(-50%); text-align:left;
+    text-shadow:0 2px 10px rgba(0,0,0,0.4); line-height:1.3;
+  }
+  .weather .temp { font-size:64px; font-weight:300; }
+  .weather .desc { font-size:18px; opacity:0.92; }
+  .weather .city { font-size:15px; opacity:0.8; }
+  .calendar {
+    position:fixed; right:22px; top:75%; transform:translateY(-50%);
+    background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.25);
+    border-radius:16px; padding:14px 16px; backdrop-filter:blur(8px);
+    text-shadow:0 1px 6px rgba(0,0,0,0.3); min-width:230px;
+  }
+  .calendar .head {
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
+  }
+  .calendar .head button {
+    background:rgba(255,255,255,0.2); border:none; color:#fff; width:26px; height:26px;
+    border-radius:50%; cursor:pointer; font-size:15px;
+  }
+  .calendar .head button:hover { background:rgba(255,255,255,0.34); }
+  .calendar .mes { font-size:15px; font-weight:500; }
+  .calendar table { width:100%; border-collapse:collapse; font-size:13px; }
+  .calendar th { font-weight:400; opacity:0.7; padding:3px 0; font-size:11px; }
+  .calendar td { text-align:center; padding:4px 0; border-radius:6px; }
+  .calendar td.hoy { background:#ff4b6b; font-weight:600; }
+  .calendar td.vacio { opacity:0; }
+</style>
+</head>
+<body>
+  <div class="grid" id="grid"></div>
+
+  <form class="search" onsubmit="buscar(event)">
+    <input id="q" type="text" placeholder="Buscar con Brave..." autofocus>
+  </form>
+
+  <div class="clock">
+    <div class="time" id="time">--:--</div>
+    <div class="date" id="date"></div>
+  </div>
+
+  <div class="weather" id="weather">
+    <div class="temp">--°</div>
+    <div class="desc">cargando...</div>
+    <div class="city">Manresa</div>
+  </div>
+
+  <div class="calendar" id="calendar">
+    <div class="head">
+      <button id="prevMes">‹</button>
+      <span class="mes" id="nombreMes"></span>
+      <button id="nextMes">›</button>
+    </div>
+    <table>
+      <thead><tr><th>L</th><th>M</th><th>X</th><th>J</th><th>V</th><th>S</th><th>D</th></tr></thead>
+      <tbody id="diasCal"></tbody>
+    </table>
+  </div>
+
+<script>
+const SITIOS = [
+  { "nombre": "La Vanguardia", "url": "https://www.lavanguardia.com", "icono": "🌐" },
+  { "nombre": "Regió7", "url": "https://www.regio7.cat", "icono": "🌐" },
+  { "nombre": "Manresa Diari", "url": "https://manresadiari.cat", "icono": "🌐" },
+  { "nombre": "Instagram", "url": "https://www.instagram.com", "icono": "🌐" },
+  { "nombre": "YouTube", "url": "https://www.youtube.com", "icono": "🌐" },
+  { "nombre": "Prime Video", "url": "https://www.primevideo.com", "icono": "🌐" },
+  { "nombre": "HBO Max", "url": "https://www.max.com", "icono": "🌐" },
+  { "nombre": "DAZN", "url": "https://www.dazn.com", "icono": "🌐" },
+  { "nombre": "Solo Latino", "url": "https://www.sololatino.net", "icono": "🌐" },
+  { "nombre": "Amazon Music", "url": "https://music.amazon.com", "icono": "🌐" },
+  { "nombre": "Amazon", "url": "https://www.amazon.es", "icono": "🌐" },
+  { "nombre": "AliExpress", "url": "https://www.aliexpress.com", "icono": "🌐" },
+  { "nombre": "Google", "url": "https://www.google.com", "icono": "🌐" },
+  { "nombre": "Maps", "url": "https://maps.google.com", "icono": "🌐" },
+  { "nombre": "Traductor", "url": "https://translate.google.com", "icono": "🌐" },
+  { "nombre": "MakerWorld", "url": "https://makerworld.com", "icono": "🌐" },
+  { "nombre": "Bitwarden", "url": "https://vault.bitwarden.com", "icono": "🌐" },
+  { "nombre": "ChatGPT", "url": "https://chat.openai.com", "icono": "🌐" }
+];
+
+function reloj(){
+  const n = new Date();
+  const h = String(n.getHours()).padStart(2,'0');
+  const m = String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('time').textContent = h+':'+m;
+  const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+  const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  document.getElementById('date').textContent = dias[n.getDay()]+", "+n.getDate()+" de "+meses[n.getMonth()]+" de "+n.getFullYear();
+}
+setInterval(reloj,1000); reloj();
+
+function dominio(url){
+  try { return new URL(url).hostname.replace('www.',''); } catch(e){ return url; }
+}
+
+function render(lista){
+  const g = document.getElementById('grid');
+  g.innerHTML = '';
+  lista.forEach((s,i)=>{
+    const dom = dominio(s.url);
+    const a = document.createElement('a');
+    a.className = 'tile';
+    a.href = s.url; a.target = '_blank';
+    const fav = 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(dom)+'&sz=64';
+    a.innerHTML = '<img class="fav" src="'+fav+'" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'emoji\',textContent:\''+(s.icono||'🌐')+'\'}))">'+
+                  '<span class="name">'+s.nombre+'</span>'+
+                  '<button class="edit" title="Cambiar nombre">✎</button>'+
+                  '<button class="del" title="Eliminar">×</button>';
+    a.querySelector('.del').onclick = (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      lista.splice(i,1); guardar(lista);
+    };
+    a.querySelector('.edit').onclick = (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      const nv = prompt('Nuevo nombre:', s.nombre);
+      if(nv!==null && nv.trim()){ s.nombre = nv.trim(); guardar(lista); }
+    };
+    g.appendChild(a);
+  });
+  const add = document.createElement('div');
+  add.className = 'tile add';
+  add.title = 'Añadir sitio';
+  add.textContent = '+';
+  add.onclick = ()=>{
+    const nombre = prompt('Nombre del sitio:');
+    if(!nombre) return;
+    const url = prompt('URL (ej: https://ejemplo.com):');
+    if(!url) return;
+    const icono = prompt('Icono (emoji, ej: 🛒  📧  🎮  ⭐  — deja vacío para 🌐):','🌐') || '🌐';
+    lista.push({nombre,url,icono});
+    guardar(lista);
+  };
+  g.appendChild(add);
+}
+
+function guardar(lista){
+  SITIOS.length = 0;
+  lista.forEach(s=>SITIOS.push(s));
+  render(SITIOS);
+  if(typeof handleCambio==='function') handleCambio();
+  // En local no podemos escribir el archivo; avisamos para sincronizar al subir a GitHub.
+  console.log('Sitios actualizados en memoria:', SITIOS.length);
+}
+
+function buscar(e){
+  e.preventDefault();
+  const q = document.getElementById('q').value.trim();
+  if(q) window.open('https://search.brave.com/search?q='+encodeURIComponent(q),'_blank');
+}
+
+// Render inicial desde la lista embebida
+render(SITIOS);
+
+// Clima Manresa (Open-Meteo, sin API key) con icono gráfico
+const W = document.getElementById('weather');
+const iconoClima = c => {
+  if(c===0) return '☀️'; if(c===1) return '🌤️'; if(c===2) return '⛅'; if(c===3) return '☁️';
+  if(c===45||c===48) return '🌫️';
+  if([51,53,55,61,63,65,80,81,82].includes(c)) return '🌧️';
+  if([71,73,75].includes(c)) return '❄️';
+  if(c>=95) return '⛈️';
+  return '🌡️';
+};
+const map = {0:'Despejado',1:'Mayormente despejado',2:'Poco nuboso',3:'Nuboso',45:'Niebla',48:'Niebla',51:'Llovizna',53:'Llovizna',55:'Llovizna',61:'Lluvia',63:'Lluvia',65:'Lluvia fuerte',71:'Nieve',73:'Nieve',75:'Nieve',80:'Chubascos',81:'Chubascos',82:'Chubascos',95:'Tormenta'};
+fetch('https://api.open-meteo.com/v1/forecast?latitude=41.7238&longitude=1.8267&current_weather=true')
+  .then(r=>r.json())
+  .then(d=>{
+    const t = Math.round(d.current_weather.temperature);
+    const code = d.current_weather.weathercode;
+    W.innerHTML = '<div class="temp">'+iconoClima(code)+' '+t+'°</div>'+
+                  '<div class="desc">'+(map[code]||'')+'</div>'+
+                  '<div class="city">Manresa</div>';
+  })
+  .catch(()=>{ W.querySelector('.desc').textContent='sin datos'; });
+
+// Calendario mini con navegación de meses
+const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const hoy = new Date();
+let vista = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+function dibujarCal(){
+  document.getElementById('nombreMes').textContent = meses[vista.getMonth()]+' '+vista.getFullYear();
+  const anio = vista.getFullYear(), mes = vista.getMonth();
+  const primero = new Date(anio, mes, 1).getDay(); // 0=dom
+  const lunesIni = (primero+6)%7; // lunes=0
+  const diasMes = new Date(anio, mes+1, 0).getDate();
+  const tb = document.getElementById('diasCal');
+  tb.innerHTML = '';
+  let celdas = [];
+  for(let i=0;i<lunesIni;i++) celdas.push('');
+  for(let d=1;d<=diasMes;d++) celdas.push(d);
+  while(celdas.length % 7 !== 0) celdas.push('');
+  let tr;
+  celdas.forEach((d,i)=>{
+    if(i%7===0) tr = document.createElement('tr');
+    const td = document.createElement('td');
+    if(d===''){ td.className='vacio'; td.textContent='·'; }
+    else {
+      td.textContent = d;
+      if(anio===hoy.getFullYear() && mes===hoy.getMonth() && d===hoy.getDate()) td.classList.add('hoy');
+    }
+    tr.appendChild(td);
+    if(i%7===6) tb.appendChild(tr);
+  });
+  if(celdas.length % 7 !== 0) tb.appendChild(tr);
+}
+document.getElementById('prevMes').onclick = ()=>{ vista.setMonth(vista.getMonth()-1); dibujarCal(); };
+document.getElementById('nextMes').onclick = ()=>{ vista.setMonth(vista.getMonth()+1); dibujarCal(); };
+dibujarCal();
+</script>
+</body>
+</html>
