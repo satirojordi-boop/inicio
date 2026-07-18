@@ -116,26 +116,8 @@
   </div>
 
 <script>
-const SITIOS = [
-  { "nombre": "La Vanguardia", "url": "https://www.lavanguardia.com", "icono": "🌐" },
-  { "nombre": "Regió7", "url": "https://www.regio7.cat", "icono": "🌐" },
-  { "nombre": "Manresa Diari", "url": "https://manresadiari.cat", "icono": "🌐" },
-  { "nombre": "Instagram", "url": "https://www.instagram.com", "icono": "🌐" },
-  { "nombre": "YouTube", "url": "https://www.youtube.com", "icono": "🌐" },
-  { "nombre": "Prime Video", "url": "https://www.primevideo.com", "icono": "🌐" },
-  { "nombre": "HBO Max", "url": "https://www.max.com", "icono": "🌐" },
-  { "nombre": "DAZN", "url": "https://www.dazn.com", "icono": "🌐" },
-  { "nombre": "Solo Latino", "url": "https://www.sololatino.net", "icono": "🌐" },
-  { "nombre": "Amazon Music", "url": "https://music.amazon.com", "icono": "🌐" },
-  { "nombre": "Amazon", "url": "https://www.amazon.es", "icono": "🌐" },
-  { "nombre": "AliExpress", "url": "https://www.aliexpress.com", "icono": "🌐" },
-  { "nombre": "Google", "url": "https://www.google.com", "icono": "🌐" },
-  { "nombre": "Maps", "url": "https://maps.google.com", "icono": "🌐" },
-  { "nombre": "Traductor", "url": "https://translate.google.com", "icono": "🌐" },
-  { "nombre": "MakerWorld", "url": "https://makerworld.com", "icono": "🌐" },
-  { "nombre": "Bitwarden", "url": "https://vault.bitwarden.com", "icono": "🌐" },
-  { "nombre": "ChatGPT", "url": "https://chat.openai.com", "icono": "🌐" }
-];
+let SITIOS = [];
+const RUTA = "sitios.json";
 
 function reloj(){
   const n = new Date();
@@ -193,12 +175,11 @@ function render(lista){
 }
 
 function guardar(lista){
-  SITIOS.length = 0;
-  lista.forEach(s=>SITIOS.push(s));
+  // Guarda en localStorage de este navegador (persiste al recargar en ESTE PC)
+  try { localStorage.setItem('sitios_inicio', JSON.stringify(SITIOS)); } catch(e){}
   render(SITIOS);
   if(typeof handleCambio==='function') handleCambio();
-  // En local no podemos escribir el archivo; avisamos para sincronizar al subir a GitHub.
-  console.log('Sitios actualizados en memoria:', SITIOS.length);
+  console.log('Sitios actualizados:', SITIOS.length);
 }
 
 function buscar(e){
@@ -207,8 +188,12 @@ function buscar(e){
   if(q) window.open('https://search.brave.com/search?q='+encodeURIComponent(q),'_blank');
 }
 
-// Render inicial desde la lista embebida
-render(SITIOS);
+// Cargar sitios: prioriza localStorage (cambios del "+" en este PC), si no, sitios.json
+try {
+  const loc = localStorage.getItem('sitios_inicio');
+  if(loc){ SITIOS = JSON.parse(loc); render(SITIOS); }
+  else { fetch(RUTA).then(r=>r.ok?r.json():[]).then(l=>{ SITIOS=l; render(SITIOS); }).catch(()=>render([])); }
+} catch(e){ fetch(RUTA).then(r=>r.ok?r.json():[]).then(l=>{ SITIOS=l; render(SITIOS); }).catch(()=>render([])); }
 
 // Clima Manresa (Open-Meteo, sin API key) con icono gráfico
 const W = document.getElementById('weather');
