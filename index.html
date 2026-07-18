@@ -142,7 +142,7 @@ function render(lista){
     const dom = dominio(s.url);
     const a = document.createElement('a');
     a.className = 'tile';
-    a.href = s.url; a.target = '_blank';
+    a.href = s.url; a.target = '_self'; a.rel = 'noopener';
     const fav = 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(dom)+'&sz=64';
     a.innerHTML = '<img class="fav" src="'+fav+'" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'emoji\',textContent:\''+(s.icono||'🌐')+'\'}))">'+
                   '<span class="name">'+s.nombre+'</span>'+
@@ -191,7 +191,7 @@ function guardar(lista){
 function buscar(e){
   e.preventDefault();
   const q = document.getElementById('q').value.trim();
-  if(q) window.open('https://search.brave.com/search?q='+encodeURIComponent(q),'_blank');
+  if(q) window.location.href = 'https://search.brave.com/search?q='+encodeURIComponent(q);
 }
 
 // Cargar sitios desde sitios.json (GitHub)
@@ -258,3 +258,4 @@ dibujarCal();
 </script>
 </body>
 </html>
+<!-- rebuild -->
