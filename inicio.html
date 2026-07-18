@@ -116,26 +116,9 @@
   </div>
 
 <script>
-const SITIOS = [
-  { "nombre": "La Vanguardia", "url": "https://www.lavanguardia.com", "icono": "🌐" },
-  { "nombre": "Regió7", "url": "https://www.regio7.cat", "icono": "🌐" },
-  { "nombre": "Manresa Diari", "url": "https://manresadiari.cat", "icono": "🌐" },
-  { "nombre": "Instagram", "url": "https://www.instagram.com", "icono": "🌐" },
-  { "nombre": "YouTube", "url": "https://www.youtube.com", "icono": "🌐" },
-  { "nombre": "Prime Video", "url": "https://www.primevideo.com", "icono": "🌐" },
-  { "nombre": "HBO Max", "url": "https://www.max.com", "icono": "🌐" },
-  { "nombre": "DAZN", "url": "https://www.dazn.com", "icono": "🌐" },
-  { "nombre": "Solo Latino", "url": "https://www.sololatino.net", "icono": "🌐" },
-  { "nombre": "Amazon Music", "url": "https://music.amazon.com", "icono": "🌐" },
-  { "nombre": "Amazon", "url": "https://www.amazon.es", "icono": "🌐" },
-  { "nombre": "AliExpress", "url": "https://www.aliexpress.com", "icono": "🌐" },
-  { "nombre": "Google", "url": "https://www.google.com", "icono": "🌐" },
-  { "nombre": "Maps", "url": "https://maps.google.com", "icono": "🌐" },
-  { "nombre": "Traductor", "url": "https://translate.google.com", "icono": "🌐" },
-  { "nombre": "MakerWorld", "url": "https://makerworld.com", "icono": "🌐" },
-  { "nombre": "Bitwarden", "url": "https://vault.bitwarden.com", "icono": "🌐" },
-  { "nombre": "ChatGPT", "url": "https://chat.openai.com", "icono": "🌐" }
-];
+let SITIOS = [];
+const RUTA = "sitios.json";
+const WORKER_URL = "https://guardar-sitios.satiro-jordi.workers.dev";
 
 function reloj(){
   const n = new Date();
@@ -159,7 +142,7 @@ function render(lista){
     const dom = dominio(s.url);
     const a = document.createElement('a');
     a.className = 'tile';
-    a.href = s.url; a.target = '_blank';
+    a.href = s.url; a.target = '_self'; a.rel = 'noopener';
     const fav = 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(dom)+'&sz=64';
     a.innerHTML = '<img class="fav" src="'+fav+'" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'emoji\',textContent:\''+(s.icono||'🌐')+'\'}))">'+
                   '<span class="name">'+s.nombre+'</span>'+
@@ -193,22 +176,29 @@ function render(lista){
 }
 
 function guardar(lista){
-  SITIOS.length = 0;
-  lista.forEach(s=>SITIOS.push(s));
+  if(WORKER_URL && WORKER_URL.indexOf("PEGAR")===-1){
+    fetch(WORKER_URL, {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({sitios:SITIOS})})
+      .then(r=>{ if(!r.ok) throw new Error("worker "+r.status); })
+      .then(()=>console.log("Sitios guardados vía Worker:", SITIOS.length))
+      .catch(err=>alert("No se pudo guardar: "+err.message));
+  } else {
+    console.log("WORKER_URL no configurada; cambios solo en memoria.");
+  }
   render(SITIOS);
-  if(typeof handleCambio==='function') handleCambio();
-  // En local no podemos escribir el archivo; avisamos para sincronizar al subir a GitHub.
-  console.log('Sitios actualizados en memoria:', SITIOS.length);
 }
 
 function buscar(e){
   e.preventDefault();
   const q = document.getElementById('q').value.trim();
-  if(q) window.open('https://search.brave.com/search?q='+encodeURIComponent(q),'_blank');
+  if(q) window.location.href = 'https://search.brave.com/search?q='+encodeURIComponent(q);
 }
 
-// Render inicial desde la lista embebida
-render(SITIOS);
+// Cargar sitios desde sitios.json (GitHub)
+fetch(RUTA)
+  .then(r=>r.ok ? r.json() : [])
+  .then(lista=>{ SITIOS = lista; render(SITIOS); })
+  .catch(()=>{ SITIOS = []; render(SITIOS); });
 
 // Clima Manresa (Open-Meteo, sin API key) con icono gráfico
 const W = document.getElementById('weather');
