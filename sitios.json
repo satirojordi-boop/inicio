@@ -1,7 +1,92 @@
 [
   {
-    "nombre": "PRUEBA_WORKER",
-    "url": "https://ejemplo.com",
-    "icono": "??"
+    "nombre": "La Vanguardia",
+    "url": "https://www.lavanguardia.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Regió7",
+    "url": "https://www.regio7.cat",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Manresa Diari",
+    "url": "https://manresadiari.cat",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Instagram",
+    "url": "https://www.instagram.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "YouTube",
+    "url": "https://www.youtube.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Prime Video",
+    "url": "https://www.primevideo.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "HBO Max",
+    "url": "https://www.max.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "DAZN",
+    "url": "https://www.dazn.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Solo Latino",
+    "url": "https://www.sololatino.net",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Amazon Music",
+    "url": "https://music.amazon.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Amazon",
+    "url": "https://www.amazon.es",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "AliExpress",
+    "url": "https://www.aliexpress.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Google",
+    "url": "https://www.google.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Maps",
+    "url": "https://maps.google.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Traductor",
+    "url": "https://translate.google.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "MakerWorld",
+    "url": "https://makerworld.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "Bitwarden",
+    "url": "https://vault.bitwarden.com",
+    "icono": "🌐"
+  },
+  {
+    "nombre": "ChatGPT",
+    "url": "https://chat.openai.com",
+    "icono": "🌐"
   }
 ]
