@@ -1,47 +1,37 @@
-#!/bin/bash
-# build.sh — Build genérico (ajusta a tu proyecto)
+#!/usr/bin/env bash
+# build.sh — Verifica y prepara mi_web (web estática)
 # Uso: ./build.sh
-# Compila, minifica, transpila, empaqueta según tu stack
 
-set -e
+set -euo pipefail
 
 cd "$(dirname "$0")"
-PROYECTO="$(basename "$(pwd)")"
 
-echo "🔨 Build $PROYECTO"
+echo "🔨 Verificando mi_web..."
 
-# ===== AJUSTA ESTO A TU PROYECTO =====
-# Ejemplos comunes:
+# 1. Archivos obligatorios
+for f in index.html sitios.json; do
+    [ -f "$f" ] || { echo "❌ Falta $f"; exit 1; }
+    echo "✅ $f existe"
+done
 
-# Node / Frontend
-# npm ci
-# npm run build
-# output en dist/ o build/
+# 2. index.html válido
+if head -n 1 index.html | grep -q '<!DOCTYPE html>'; then
+    echo "✅ index.html tiene DOCTYPE válido"
+else
+    echo "⚠️  index.html no parece HTML válido"
+fi
 
-# Python
-# pip install -r requirements.txt
-# python -m build
-# output en dist/
+# 3. sitios.json válido
+if python -c "import json,sys; json.load(open('sitios.json'))" 2>/dev/null; then
+    COUNT=$(python -c "import json; print(len(json.load(open('sitios.json'))))")
+    echo "✅ sitios.json válido ($COUNT accesos)"
+else
+    echo "❌ sitios.json NO es JSON válido"
+    exit 1
+fi
 
-# Go
-# go build -o output/bin ./cmd/...
+# 4. deploy.sh ejecutable
+[ -x deploy.sh ] && echo "✅ deploy.sh ejecutable" || echo "⚠️  deploy.sh no ejecutable (chmod +x deploy.sh)"
 
-# Rust
-# cargo build --release
-# cp target/release/bin output/
-
-# Android (Gradle)
-# ./gradlew assembleRelease
-# cp app/build/outputs/apk/release/*.apk output/
-
-# OpenSCAD (render a PNG/STL)
-# openscad -o output/modelo.png --imgsize=1200,900 --viewall --autocenter --colorscheme=Metallic src/modelo.scad
-
-# Diagramas (Mermaid / PlantUML)
-# mmdc -i docs/diagrama.mmd -o output/diagrama.png
-
-# ======================================
-
-# Por defecto: solo avisa
-echo "⚠️  build.sh es plantilla: edita la sección 'AJUSTA ESTO' y descomenta lo que uses."
-echo "✅ Build simulado completado."
+echo ""
+echo "✅ Build verificado. Todo listo para ./deploy.sh"

@@ -1,39 +1,31 @@
-#!/bin/bash
-# deploy.sh — Deploy genérico (ajusta a tu proyecto)
+#!/usr/bin/env bash
+# deploy.sh — Sube mi_web a GitHub Pages
 # Uso: ./deploy.sh
-# Por defecto: git add/commit/push → GitHub Pages / Netlify / Vercel / servidor
 
-set -e
+set -euo pipefail
 
 cd "$(dirname "$0")"
-PROYECTO="$(basename "$(pwd)")"
 
-echo "🚀 Deploy $PROYECTO"
+echo "🚀 Desplegando mi_web a GitHub Pages..."
 
-# ===== AJUSTA ESTO A TU PROYECTO =====
-# Opción A: GitHub Pages / Netlify / Vercel (git push)
-# git add -A
-# git commit -m "Deploy: $(date '+%Y-%m-%d %H:%M')"
-# git push origin main
+# Archivos a desplegar
+ARCHIVOS="index.html sitios.json"
 
-# Opción B: rsync a servidor
-# rsync -avz --delete output/ user@server:/var/www/proyecto/
+# Verifica que existan
+for f in $ARCHIVOS; do
+    [ -f "$f" ] || { echo "❌ Falta $f"; exit 1; }
+done
 
-# Opción C: scp a Raspberry / VPS
-# scp -r output/* user@ip:/ruta/
+# Git add + commit + push
+git add $ARCHIVOS
+git commit -m "Deploy mi_web: $(date '+%Y-%m-%d %H:%M')" || {
+    echo "ℹ️  Sin cambios nuevos (commit vacío)."
+}
+git push origin main
 
-# Opción D: wrangler deploy (Cloudflare Workers/Pages)
-# wrangler deploy
-
-# Opción E: curl a webhook / API
-# curl -X POST -H "Authorization: Bearer $DEPLOY_TOKEN" ...
-
-# ======================================
-
-# Por defecto: git push (descomenta y ajusta)
-# git add -A
-# git commit -m "Deploy $PROYECTO: $(date '+%Y-%m-%d %H:%M')"
-# git push origin main
-
-echo "⚠️  deploy.sh es plantilla: edita la sección 'AJUSTA ESTO' y descomenta lo que uses."
-echo "✅ Hecho (simulado)."
+echo ""
+echo "✅ Push completado a GitHub."
+echo "⏳ GitHub Pages reconstruye en 1-2 minutos."
+echo "🌐 https://satirojordi-boop.github.io/inicio/"
+echo ""
+echo "💡 Fuerza recarga: Ctrl+Shift+R o abre en incógnito"
