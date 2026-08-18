@@ -11,56 +11,48 @@
     background: linear-gradient(135deg, #5b2bd6 0%, #7b3be0 30%, #b14bff 65%, #ff4b6b 100%);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     min-height:100vh; overflow:hidden;
-    padding-top: 50px; /* más aire arriba */
+    padding-top: 50px;
   }
   .grid {
     display:grid; grid-template-columns:repeat(10,minmax(96px,1fr));
     gap:18px; width:min(1040px,96vw); margin-bottom:34px;
-    /* transform:translateY(-80px); quitado para dar aire arriba */
   }
   .search {
     width:min(620px,86vw); display:flex; background:rgba(255,255,255,0.16);
     backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.3);
     border-radius:40px; padding:12px 22px; margin-bottom:18px;
   }
-  .clock {
-    text-align:center; text-shadow:0 2px 12px rgba(0,0,0,0.35);
-  }
+  .clock { text-align:center; text-shadow:0 2px 12px rgba(0,0,0,0.35); }
   .clock .time { font-size:72px; font-weight:300; letter-spacing:2px; }
   .clock .date { font-size:18px; opacity:0.9; margin-top:4px; }
-  .search input {
-    flex:1; background:transparent; border:none; outline:none; color:#fff;
-    font-size:18px;
-  }
+  .search input { flex:1; background:transparent; border:none; outline:none; color:#fff; font-size:18px; }
   .search input::placeholder { color:rgba(255,255,255,0.7); }
   .tile {
     background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.25);
-    border-radius:16px; padding:14px 8px; text-align:center; cursor:pointer;
-    transition:transform .12s, background .12s; text-decoration:none; color:#fff;
+    border-radius:16px; padding:14px 8px; text-align:center; cursor:grab;
+    transition:transform .12s, background .12s, box-shadow .12s; text-decoration:none; color:#fff;
     position:relative;
   }
+  .tile:active { cursor:grabbing; }
   .tile:hover { transform:translateY(-4px); background:rgba(255,255,255,0.26); }
-  .tile .emoji { font-size:34px; display:block; }
-  .tile .fav { width:40px; height:40px; display:block; margin:0 auto; object-fit:contain; }
-  .tile .name { font-size:13px; margin-top:8px; opacity:0.95; word-break:break-word; }
-  .tile .del {
-    position:absolute; top:-8px; right:-8px; width:22px; height:22px; border-radius:50%;
-    background:#ff4b6b; border:none; color:#fff; font-size:13px; cursor:pointer; display:none;
+  .tile.dragging { opacity:0.5; background:rgba(255,255,255,0.35); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+  .tile.drag-over { border:2px dashed #ffd24b; background:rgba(255,210,75,0.15); }
+  .tile .fav { width:40px; height:40px; display:block; margin:0 auto 6px; object-fit:contain; }
+  .tile .emoji { font-size:34px; display:block; margin-bottom:6px; }
+  .tile .name { font-size:13px; opacity:0.95; word-break:break-word; line-height:1.2; }
+  .tile .del, .tile .edit {
+    position:absolute; top:-8px; width:22px; height:22px; border-radius:50%;
+    border:none; font-size:13px; cursor:pointer; display:none; z-index:10;
   }
-  .tile .edit {
-    position:absolute; top:-8px; left:-8px; width:22px; height:22px; border-radius:50%;
-    background:#ffd24b; border:none; color:#222; font-size:12px; cursor:pointer; display:none;
-  }
+  .tile .del { right:-8px; background:#ff4b6b; color:#fff; }
+  .tile .edit { left:-8px; background:#ffd24b; color:#222; font-size:12px; }
   .tile:hover .del, .tile:hover .edit { display:block; }
   .add {
     background:rgba(255,255,255,0.22); border:2px dashed rgba(255,255,255,0.5);
-    display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:200;
+    display:flex; align-items:center; justify-content:center; font-size:40px; font-weight:200; cursor:pointer;
   }
   .add:hover { background:rgba(255,255,255,0.34); }
-  .weather {
-    position:fixed; left:22px; top:75%; transform:translateY(-50%); text-align:left;
-    text-shadow:0 2px 10px rgba(0,0,0,0.4); line-height:1.3;
-  }
+  .weather { position:fixed; left:22px; top:75%; transform:translateY(-50%); text-align:left; text-shadow:0 2px 10px rgba(0,0,0,0.4); line-height:1.3; }
   .weather .temp { font-size:64px; font-weight:300; }
   .weather .desc { font-size:18px; opacity:0.92; }
   .weather .city { font-size:15px; opacity:0.8; }
@@ -70,13 +62,8 @@
     border-radius:16px; padding:14px 16px; backdrop-filter:blur(8px);
     text-shadow:0 1px 6px rgba(0,0,0,0.3); min-width:230px;
   }
-  .calendar .head {
-    display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
-  }
-  .calendar .head button {
-    background:rgba(255,255,255,0.2); border:none; color:#fff; width:26px; height:26px;
-    border-radius:50%; cursor:pointer; font-size:15px;
-  }
+  .calendar .head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .calendar .head button { background:rgba(255,255,255,0.2); border:none; color:#fff; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:15px; }
   .calendar .head button:hover { background:rgba(255,255,255,0.34); }
   .calendar .mes { font-size:15px; font-weight:500; }
   .calendar table { width:100%; border-collapse:collapse; font-size:13px; }
@@ -84,6 +71,39 @@
   .calendar td { text-align:center; padding:4px 0; border-radius:6px; }
   .calendar td.hoy { background:#ff4b6b; font-weight:600; }
   .calendar td.vacio { opacity:0; }
+
+  /* Modal edicion */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center; z-index:1000;
+    opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  .modal-overlay.open { opacity:1; pointer-events:auto; }
+  .modal {
+    background:#2a1a4a; border:1px solid rgba(255,255,255,0.3); border-radius:20px;
+    padding:24px; width:min(420px,90vw); box-shadow:0 12px 40px rgba(0,0,0,0.4);
+    transform:scale(0.95); transition:transform .2s;
+  }
+  .modal-overlay.open .modal { transform:scale(1); }
+  .modal h3 { margin-bottom:18px; font-size:20px; font-weight:600; }
+  .modal .field { margin-bottom:14px; }
+  .modal label { display:block; font-size:13px; opacity:0.8; margin-bottom:6px; }
+  .modal input {
+    width:100%; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+    border-radius:10px; padding:12px 14px; color:#fff; font-size:15px; outline:none;
+  }
+  .modal input:focus { border-color:#ffd24b; box-shadow:0 0 0 3px rgba(255,210,75,0.2); }
+  .modal input::placeholder { color:rgba(255,255,255,0.5); }
+  .modal .actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+  .modal button {
+    padding:10px 20px; border-radius:10px; font-size:14px; font-weight:500; cursor:pointer; border:none;
+  }
+  .modal .btn-cancel { background:rgba(255,255,255,0.15); color:#fff; }
+  .modal .btn-cancel:hover { background:rgba(255,255,255,0.25); }
+  .modal .btn-save { background:linear-gradient(135deg,#5b2bd6,#b14bff); color:#fff; }
+  .modal .btn-save:hover { box-shadow:0 4px 16px rgba(91,43,214,0.4); }
+  .modal .btn-del { background:#ff4b6b; color:#fff; margin-right:auto; }
+  .modal .btn-del:hover { box-shadow:0 4px 16px rgba(255,75,107,0.4); }
 </style>
 </head>
 <body>
@@ -116,10 +136,36 @@
     </table>
   </div>
 
+  <!-- Modal edicion -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3 id="modalTitle">Editar sitio</h3>
+      <div class="field">
+        <label>Nombre</label>
+        <input id="editNombre" type="text" placeholder="Nombre del sitio">
+      </div>
+      <div class="field">
+        <label>URL</label>
+        <input id="editUrl" type="url" placeholder="https://ejemplo.com">
+      </div>
+      <div class="field">
+        <label>Icono (emoji)</label>
+        <input id="editIcono" type="text" maxlength="2" placeholder="🌐">
+      </div>
+      <div class="actions">
+        <button class="btn-del" id="btnDel">Eliminar</button>
+        <button class="btn-cancel" id="btnCancel">Cancelar</button>
+        <button class="btn-save" id="btnSave">Guardar</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 let SITIOS = [];
 const RUTA = "sitios.json";
 const WORKER_URL = "https://guardar-sitios.satiro-jordi.workers.dev";
+let draggedIndex = -1;
+let editingIndex = -1;
 
 function reloj(){
   const n = new Date();
@@ -128,7 +174,7 @@ function reloj(){
   document.getElementById('time').textContent = h+':'+m;
   const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-  document.getElementById('date').textContent = dias[n.getDay()]+", "+n.getDate()+" de "+meses[n.getMonth()]+" de "+n.getFullYear();
+  document.getElementById('date').textContent = dias[n.getDay()]+" "+n.getDate()+" de "+meses[n.getMonth()]+" de "+n.getFullYear();
 }
 setInterval(reloj,1000); reloj();
 
@@ -143,49 +189,101 @@ function render(lista){
     const dom = dominio(s.url);
     const a = document.createElement('a');
     a.className = 'tile';
+    a.draggable = true;
+    a.dataset.index = i;
     a.href = s.url; a.target = '_self'; a.rel = 'noopener';
     const fav = 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(dom)+'&sz=64';
     a.innerHTML = '<img class="fav" src="'+fav+'" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'emoji\',textContent:\''+(s.icono||'🌐')+'\'}))">'+
-                  '<span class="name">'+s.nombre+'</span>'+
-                  '<button class="edit" title="Cambiar nombre">✎</button>'+
-                  '<button class="del" title="Eliminar">×</button>';
+                  '<span class="name">'+s.nombre+'</span>' +
+                  '<button class="del" title="Eliminar">×</button>' +
+                  '<button class="edit" title="Editar">✎</button>';
+    // Drag events
+    a.ondragstart = (e)=>{ draggedIndex=i; a.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; };
+    a.ondragend = ()=>{ a.classList.remove('dragging'); document.querySelectorAll('.tile').forEach(t=>t.classList.remove('drag-over')); };
+    a.ondragover = (e)=>{ e.preventDefault(); if(i!==draggedIndex) a.classList.add('drag-over'); e.dataTransfer.dropEffect='move'; };
+    a.ondragleave = ()=>{ a.classList.remove('drag-over'); };
+    a.ondrop = (e)=>{
+      e.preventDefault();
+      a.classList.remove('drag-over');
+      if(draggedIndex!==-1 && draggedIndex!==i){
+        const [moved] = lista.splice(draggedIndex,1);
+        lista.splice(i,0,moved);
+        guardar(lista);
+      }
+    };
+    // Botones
     a.querySelector('.del').onclick = (e)=>{
       e.preventDefault(); e.stopPropagation();
-      lista.splice(i,1); guardar(lista);
+      if(confirm('Eliminar "'+s.nombre+'"?')){ lista.splice(i,1); guardar(lista); }
     };
     a.querySelector('.edit').onclick = (e)=>{
       e.preventDefault(); e.stopPropagation();
-      const nv = prompt('Nuevo nombre:', s.nombre);
-      if(nv!==null && nv.trim()){ s.nombre = nv.trim(); guardar(lista); }
+      openModal(i);
     };
     g.appendChild(a);
   });
+  // Boton anadir
   const add = document.createElement('div');
   add.className = 'tile add';
   add.title = 'Añadir sitio';
   add.textContent = '+';
-  add.onclick = ()=>{
-    const nombre = prompt('Nombre del sitio:');
-    if(!nombre) return;
-    const url = prompt('URL (ej: https://ejemplo.com):');
-    if(!url) return;
-    const icono = prompt('Icono (emoji, ej: 🛒  📧  🎮  ⭐  — deja vacío para 🌐):','🌐') || '🌐';
-    lista.push({nombre,url,icono});
-    guardar(lista);
-  };
+  add.onclick = ()=> openModal(-1);
   g.appendChild(add);
 }
 
+function openModal(index){
+  editingIndex = index;
+  const overlay = document.getElementById('modalOverlay');
+  const title = document.getElementById('modalTitle');
+  const btnDel = document.getElementById('btnDel');
+
+  if(index === -1){
+    title.textContent = 'Añadir sitio';
+    document.getElementById('editNombre').value = '';
+    document.getElementById('editUrl').value = '';
+    document.getElementById('editIcono').value = '🌐';
+    btnDel.style.display = 'none';
+  } else {
+    title.textContent = 'Editar sitio';
+    const s = SITIOS[index];
+    document.getElementById('editNombre').value = s.nombre;
+    document.getElementById('editUrl').value = s.url;
+    document.getElementById('editIcono').value = s.icono || '🌐';
+    btnDel.style.display = 'inline-block';
+  }
+  overlay.classList.add('open');
+  document.getElementById('editNombre').focus();
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingIndex = -1;
+}
+
+document.getElementById('btnCancel').onclick = closeModal;
+document.getElementById('modalOverlay').onclick = (e)=>{ if(e.target.id==='modalOverlay') closeModal(); };
+document.getElementById('btnDel').onclick = ()=>{
+  if(confirm('Eliminar "'+SITIOS[editingIndex].nombre+'"?')){ SITIOS.splice(editingIndex,1); guardar(SITIOS); }
+  closeModal();
+};
+document.getElementById('btnSave').onclick = ()=>{
+  const n = document.getElementById('editNombre').value.trim();
+  const u = document.getElementById('editUrl').value.trim();
+  const ic = document.getElementById('editIcono').value.trim() || '🌐';
+  if(!n || !u){ alert('Nombre y URL son obligatorios'); return; }
+  if(editingIndex === -1) SITIOS.push({nombre:n,url:u,icono:ic});
+  else { SITIOS[editingIndex] = {nombre:n,url:u,icono:ic}; }
+  guardar(SITIOS);
+  closeModal();
+};
+
 function guardar(lista){
   if(WORKER_URL && WORKER_URL.indexOf("PEGAR")===-1){
-    fetch(WORKER_URL, {method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({sitios:SITIOS})})
+    fetch(WORKER_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({sitios:lista})})
       .then(r=>{ if(!r.ok) throw new Error("worker "+r.status); })
-      .then(()=>console.log("Sitios guardados vía Worker:", SITIOS.length))
+      .then(()=>console.log("Sitios guardados vía Worker:", lista.length))
       .catch(err=>alert("No se pudo guardar: "+err.message));
-  } else {
-    console.log("WORKER_URL no configurada; cambios solo en memoria.");
-  }
+  } else { console.log("WORKER_URL no configurada; cambios solo en memoria."); }
   render(SITIOS);
 }
 
@@ -201,7 +299,7 @@ fetch(RUTA)
   .then(lista=>{ SITIOS = lista; render(SITIOS); })
   .catch(()=>{ SITIOS = []; render(SITIOS); });
 
-// Clima Manresa (Open-Meteo, sin API key) con icono gráfico
+// Clima Manresa (Open-Meteo)
 const W = document.getElementById('weather');
 const iconoClima = c => {
   if(c===0) return '☀️'; if(c===1) return '🌤️'; if(c===2) return '⛅'; if(c===3) return '☁️';
@@ -223,15 +321,15 @@ fetch('https://api.open-meteo.com/v1/forecast?latitude=41.7238&longitude=1.8267&
   })
   .catch(()=>{ W.querySelector('.desc').textContent='sin datos'; });
 
-// Calendario mini con navegación de meses
+// Calendario mini con navegacion de meses
 const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const hoy = new Date();
 let vista = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
 function dibujarCal(){
   document.getElementById('nombreMes').textContent = meses[vista.getMonth()]+' '+vista.getFullYear();
   const anio = vista.getFullYear(), mes = vista.getMonth();
-  const primero = new Date(anio, mes, 1).getDay(); // 0=dom
-  const lunesIni = (primero+6)%7; // lunes=0
+  const primero = new Date(anio, mes, 1).getDay();
+  const lunesIni = (primero+6)%7;
   const diasMes = new Date(anio, mes+1, 0).getDate();
   const tb = document.getElementById('diasCal');
   tb.innerHTML = '';
@@ -251,7 +349,6 @@ function dibujarCal(){
     tr.appendChild(td);
     if(i%7===6) tb.appendChild(tr);
   });
-  if(celdas.length % 7 !== 0) tb.appendChild(tr);
 }
 document.getElementById('prevMes').onclick = ()=>{ vista.setMonth(vista.getMonth()-1); dibujarCal(); };
 document.getElementById('nextMes').onclick = ()=>{ vista.setMonth(vista.getMonth()+1); dibujarCal(); };
