@@ -38,7 +38,7 @@
   .tile.dragging { opacity:0.5; background:rgba(255,255,255,0.35); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
   .tile.drag-over { border:2px dashed #ffd24b; background:rgba(255,210,75,0.15); }
   .tile .fav { width:40px; height:40px; display:block; margin:0 auto 6px; object-fit:contain; outline:none; border:none; }
-    .tile .emoji { font-size:34px; display:block; margin-bottom:6px; outline:none; border:none; }
+  .tile .emoji { font-size:34px; display:block; margin-bottom:6px; outline:none; border:none; }
   .tile .name { font-size:13px; opacity:0.95; word-break:break-word; line-height:1.2; }
   .tile .del, .tile .edit {
     position:absolute; top:-8px; width:22px; height:22px; border-radius:50%;
@@ -86,7 +86,7 @@
   }
   .modal-overlay.open .modal { transform:scale(1); }
   .modal h3 { margin-bottom:18px; font-size:20px; font-weight:600; }
-  .modal .field { margin-bottom:14px; }
+  .modal .field { margin-bottom:14px; position:relative; }
   .modal label { display:block; font-size:13px; opacity:0.8; margin-bottom:6px; }
   .modal input {
     width:100%; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
@@ -105,26 +105,28 @@
   .modal .btn-del { background:#ff4b6b; color:#fff; margin-right:auto; }
   .modal .btn-del:hover { box-shadow:0 4px 16px rgba(255,75,107,0.4); }
 
-    /* Emoji picker */
-    .emoji-picker {
-      display:none; position:absolute; bottom:100%; left:0; margin-bottom:8px;
-      background:#2a1a4a; border:1px solid rgba(255,255,255,0.3); border-radius:12px;
-      padding:12px; box-shadow:0 8px 24px rgba(0,0,0,0.4); z-index:50;
-      max-height:200px; overflow-y:auto;
-    }
-    .emoji-picker.open { display:grid; grid-template-columns:repeat(8,1fr); gap:6px; }
-    .emoji-picker button {
-      background:transparent; border:none; font-size:22px; cursor:pointer;
-      padding:4px; border-radius:6px; transition:transform .1s, background .1s;
-    }
-    .emoji-picker button:hover { transform:scale(1.3); background:rgba(255,255,255,0.15); }
-    .emoji-cats { display:flex; gap:4px; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.15); }
-    .emoji-cats button {
-      background:rgba(255,255,255,0.1); border:none; color:#fff; padding:4px 10px;
-      border-radius:6px; font-size:12px; cursor:pointer;
-    }
-    .emoji-cats button.active { background:#ffd24b; color:#222; }
-  </style>
+  /* Emoji picker - ANCHO COMPLETO del modal */
+  .emoji-picker {
+    display:none; position:absolute; bottom:100%; left:0; right:0; margin-bottom:8px;
+    background:#2a1a4a; border:1px solid rgba(255,255,255,0.3); border-radius:12px;
+    padding:12px; box-shadow:0 8px 24px rgba(0,0,0,0.4); z-index:50;
+    max-height:280px; overflow-y:auto;
+  }
+  .emoji-picker.open { display:flex; flex-direction:column; gap:8px; }
+  .emoji-cats { display:flex; gap:4px; margin-bottom:4px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.15); flex-wrap:wrap; justify-content:center; }
+  .emoji-cats button {
+    background:rgba(255,255,255,0.1); border:none; color:#fff; padding:6px 12px;
+    border-radius:6px; font-size:12px; cursor:pointer; white-space:nowrap;
+  }
+  .emoji-cats button.active { background:#ffd24b; color:#222; }
+  .emoji-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:8px; }
+  .emoji-grid button {
+    background:transparent; border:none; font-size:24px; cursor:pointer;
+    padding:6px; border-radius:8px; transition:transform .1s, background .1s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .emoji-grid button:hover { transform:scale(1.2); background:rgba(255,255,255,0.15); }
+</style>
 </head>
 <body>
   <div class="grid" id="grid"></div>
@@ -169,10 +171,10 @@
         <input id="editUrl" type="url" placeholder="https://ejemplo.com">
       </div>
       <div class="field">
-              <label>Icono (emoji)</label>
-              <input id="editIcono" type="text" maxlength="2" placeholder="🌐" readonly onclick="abrirEmojiPicker()">
-              <div class="emoji-picker" id="emojiPicker"></div>
-            </div>
+        <label>Icono (emoji)</label>
+        <input id="editIcono" type="text" maxlength="2" placeholder="🌐" readonly onclick="abrirEmojiPicker()">
+        <div class="emoji-picker" id="emojiPicker"></div>
+      </div>
       <div class="actions">
         <button class="btn-del" id="btnDel">Eliminar</button>
         <button class="btn-cancel" id="btnCancel">Cancelar</button>
@@ -217,18 +219,18 @@ function render(lista){
     a.draggable = true;
     a.dataset.index = i;
     a.href = s.url; a.target = '_self'; a.rel = 'noopener';
-    // Construir el icono de forma robusta
-let iconHtml = '';
-if(s.icono && s.icono.trim() && s.icono !== "🌐"){
-  // Si tiene emoji personalizado DIFERENTE de 🌐, usarlo
-  iconHtml = '<span class="emoji">'+s.icono+'</span>';
-} else {
-  // Si no, intentar favicon de Google con fallback a emoji
-  const fav = 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(dom)+'&sz=64';
-  iconHtml = '<img class="fav" src="'+fav+'" alt="" onerror="fallbackEmoji(this)">';
-}
-a.innerHTML = iconHtml +
-'<span class="name">'+s.nombre+'</span>' +
+    
+    // Icono: emoji personalizado SI es distinto de 🌐; si no, favicon con fallback
+    let iconHtml = '';
+    if(s.icono && s.icono.trim() && s.icono !== "🌐"){
+      iconHtml = '<span class="emoji">'+s.icono+'</span>';
+    } else {
+      const fav = 'https://www.google.com/s2/favicons?domain='+encodeURIComponent(dom)+'&sz=64';
+      iconHtml = '<img class="fav" src="'+fav+'" alt="" onerror="fallbackEmoji(this)">';
+    }
+    
+    a.innerHTML = iconHtml +
+                  '<span class="name">'+s.nombre+'</span>' +
                   '<button class="del" title="Eliminar">×</button>' +
                   '<button class="edit" title="Editar">✎</button>';
     // Drag events
@@ -295,9 +297,6 @@ function closeModal(){
   document.getElementById('emojiPicker').classList.remove('open');
 }
 
-document.getElementById('btnCancel').onclick = closeModal;
-document.getElementById('modalOverlay').onclick = (e)=>{ if(e.target.id==='modalOverlay') closeModal(); };
-
 // Emoji picker
 const EMOJIS = {
   'Comunes': ['🌐','🏠','🔍','📺','🎮','🛒','📱','💻','🎵','📚','🍔','☕','✈️','🏦','🏥','⚙️','🔧','🎨','📝','📷'],
@@ -310,9 +309,7 @@ const EMOJIS = {
 
 function abrirEmojiPicker(){
   const picker = document.getElementById('emojiPicker');
-  const input = document.getElementById('editIcono');
   
-  // Construir HTML del picker
   let html = '<div class="emoji-cats">';
   Object.keys(EMOJIS).forEach((cat, i) => {
     html += '<button class="'+(i===0?'active':'')+'" onclick="cambiarCategoria(this,'+i+')">'+cat+'</button>';
@@ -320,17 +317,9 @@ function abrirEmojiPicker(){
   html += '</div><div class="emoji-grid" id="emojiGrid"></div>';
   picker.innerHTML = html;
   
-  // Mostrar primera categoría
   mostrarCategoria(0);
-  
-  // Posicionar bajo el input
-  const rect = input.getBoundingClientRect();
-  picker.style.left = rect.left + 'px';
-  picker.style.top = (rect.top - 8) + 'px';
-  
   picker.classList.add('open');
   
-  // Cerrar al hacer click fuera
   setTimeout(() => {
     document.addEventListener('click', cerrarEmojiPickerFuera);
   }, 0);
@@ -346,7 +335,7 @@ function mostrarCategoria(idx){
   const cats = Object.keys(EMOJIS);
   const cat = cats[idx];
   const grid = document.getElementById('emojiGrid');
-  grid.innerHTML = EMOJIS[cat].map(e => 
+  grid.innerHTML = EMOJIS[cat].map(e =>
     '<button onclick="seleccionarEmoji(\''+e+'\')">'+e+'</button>'
   ).join('');
 }
@@ -359,8 +348,7 @@ function seleccionarEmoji(e){
 
 function cerrarEmojiPickerFuera(e){
   const picker = document.getElementById('emojiPicker');
-  const input = document.getElementById('editIcono');
-  if(!picker.contains(e.target) && e.target !== input){
+  if(!picker.contains(e.target)){
     picker.classList.remove('open');
     document.removeEventListener('click', cerrarEmojiPickerFuera);
   }
