@@ -113,5 +113,10 @@
     "nombre": "lm",
     "url": "mñ",
     "icono": "🌐"
+  },
+  {
+    "nombre": "m,ñ",
+    "url": "m,ñ",
+    "icono": "🌐"
   }
 ]
