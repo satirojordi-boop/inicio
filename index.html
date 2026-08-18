@@ -219,8 +219,8 @@ function render(lista){
     a.href = s.url; a.target = '_self'; a.rel = 'noopener';
     // Construir el icono de forma robusta
 let iconHtml = '';
-if(s.icono && s.icono.trim()){
-  // Si tiene emoji personalizado, usarlo directo
+if(s.icono && s.icono.trim() && s.icono !== "🌐"){
+  // Si tiene emoji personalizado DIFERENTE de 🌐, usarlo
   iconHtml = '<span class="emoji">'+s.icono+'</span>';
 } else {
   // Si no, intentar favicon de Google con fallback a emoji
