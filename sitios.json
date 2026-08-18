@@ -108,5 +108,10 @@
     "nombre": "Github",
     "url": "https://github.com/satirojordi-boop",
     "icono": "🌐"
+  },
+  {
+    "nombre": "Manresa Diari",
+    "url": "https://www.manresadiari.cat/",
+    "icono": "🌐"
   }
 ]
