@@ -100,6 +100,11 @@
     "icono": "🌐"
   },
   {
+    "nombre": "http://127.0.0.1:8384",
+    "url": "http://127.0.0.1:8384",
+    "icono": "🌐"
+  },
+  {
     "nombre": "Github",
     "url": "https://github.com/satirojordi-boop",
     "icono": "🌐"
