@@ -10,6 +10,11 @@
     "icono": "🌐"
   },
   {
+    "nombre": "Manresa Diari",
+    "url": "https://manresadiari.cat",
+    "icono": "🌐"
+  },
+  {
     "nombre": "Instagram",
     "url": "https://www.instagram.com",
     "icono": "🌐"
@@ -95,18 +100,8 @@
     "icono": "🌐"
   },
   {
-    "nombre": "http://127.0.0.1:8384",
-    "url": "http://127.0.0.1:8384",
-    "icono": "🌐"
-  },
-  {
     "nombre": "Github",
     "url": "https://github.com/satirojordi-boop",
-    "icono": "🌐"
-  },
-  {
-    "nombre": "Manresa Diari",
-    "url": "https://www.manresadiari.cat/",
     "icono": "🌐"
   }
 ]
