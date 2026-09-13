@@ -210,7 +210,9 @@ const SITIOS_RESPALDO = [
   {"nombre": "ChatGPT", "url": "https://chat.openai.com", "icono": "🌐"},
   {"nombre": "Descarga Yotube", "url": "https://www.freemake.com/es/free_video_downloader_splendid/", "icono": "🌐"},
   {"nombre": "Vento", "url": "https://cloud.vento.build/workspace/networks/satiro_jordi?chatContact=vento_agent&chatConversation=satiro_jordi%40hotmail.com--vento_agent--20260725_065837_7fb&tabs=link-aHR0cHM6Ly9jbG91ZC52ZW50by5idWlsZC9uZXR3b3Jrcy9zYXRpcm9fam9yZGkvYXBwcy9yb2JvdC12aXRyaW5hLXYwLjktZGVidWcuYXBr%3ADescargar+Robot+Vitrina+v0.9", "icono": "🌐"},
-  {"nombre": "Github", "url": "https://github.com/satirojordi-boop", "icono": "🌐"}
+  {"nombre": "Github", "url": "https://github.com/satirojordi-boop", "icono": "🌐"},
+  {"nombre": "descargar Instagarm", "url": "https://sssinstagram.com/es/reels-downloader", "icono": "🌐"},
+  {"nombre": "ya", "url": "https://www.xatakamovil.com/jazztel-1/que-fue-com-historia-mitico-proveedor-adsl-barato-que-empezo-como-gran-competencia-terra", "icono": "🌐"}
 ];
 const WORKER_URL = "https://guardar-sitios.satiro-jordi.workers.dev";
 let draggedIndex = -1;
@@ -397,12 +399,38 @@ document.getElementById('btnSave').onclick = ()=>{
   closeModal();
 };
 
+function aviso(msg, ok){
+  let d = document.getElementById('aviso-toast');
+  if(!d){
+    d = document.createElement('div');
+    d.id = 'aviso-toast';
+    d.style.cssText = 'position:fixed;top:18px;left:50%;transform:translateX(-50%);padding:10px 18px;' +
+      'border-radius:12px;font-size:15px;z-index:2000;transition:opacity .3s;background:#1e7f4f;color:#fff;' +
+      'box-shadow:0 6px 20px rgba(0,0,0,.35)';
+    document.body.appendChild(d);
+  }
+  d.style.background = ok === false ? '#b3253c' : '#1e7f4f';
+  d.textContent = msg;
+  d.style.opacity = '1';
+  clearTimeout(window.__avisoT);
+  window.__avisoT = setTimeout(()=>{ d.style.opacity = '0'; }, 3500);
+}
+
+// Lee sitios.json SIN la copia cacheada del CDN/navegador (?v= rompe la caché de 10 min
+// que pone GitHub Pages: sin esto, al recargar seguían saliendo los enlaces viejos).
+function cargarSitios(){
+  return fetch(RUTA + "?v=" + Date.now())
+    .then(r=>r.ok ? r.json() : [])
+    .then(lista=>{ if(Array.isArray(lista) && lista.length){ SITIOS = lista; render(SITIOS); } })
+    .catch(()=>{});
+}
+
 function guardar(lista){
   if(WORKER_URL && WORKER_URL.indexOf("PEGAR")===-1){
     fetch(WORKER_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({sitios:lista})})
       .then(r=>{ if(!r.ok) throw new Error("worker "+r.status); })
-      .then(()=>console.log("Sitios guardados vía Worker:", lista.length))
-      .catch(err=>alert("No se pudo guardar: "+err.message));
+      .then(()=>{ aviso("Guardado en GitHub ✓"); cargarSitios(); })
+      .catch(err=>{ alert("No se pudo guardar: "+err.message); aviso("No se pudo guardar: "+err.message, false); });
   } else { console.log("WORKER_URL no configurada; cambios solo en memoria."); }
   render(SITIOS);
 }
@@ -418,10 +446,7 @@ function buscar(e){
 SITIOS = SITIOS_RESPALDO.slice();
 render(SITIOS);
 
-fetch(RUTA)
-  .then(r=>r.ok ? r.json() : [])
-  .then(lista=>{ SITIOS = (Array.isArray(lista) && lista.length) ? lista : SITIOS_RESPALDO.slice(); render(SITIOS); })
-  .catch(()=>{ SITIOS = SITIOS_RESPALDO.slice(); render(SITIOS); });
+cargarSitios();
 
 // Clima Manresa (Open-Meteo)
 const W = document.getElementById('weather');
