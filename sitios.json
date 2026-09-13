@@ -118,5 +118,10 @@
     "nombre": "buscador de tesoros",
     "url": "https://www.metaldetector.com/pages/descubra-los-secretos-que-los-buscadores-de-tesoros-exitosos-usan-para-localizar-tesoros",
     "icono": "🌐"
+  },
+  {
+    "nombre": "PRUEBA-TIEMPO",
+    "url": "https://example.com",
+    "icono": "🌐"
   }
 ]
