@@ -448,6 +448,11 @@ render(SITIOS);
 
 cargarSitios();
 
+// Si vuelves a una pestaña que llevaba rato abierta, relee la lista del servidor ANTES de que
+// toques nada: así una pestaña vieja no puede guardar su copia antigua y borrar enlaces nuevos.
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) cargarSitios(); });
+window.addEventListener('focus', ()=>{ cargarSitios(); });
+
 // Clima Manresa (Open-Meteo)
 const W = document.getElementById('weather');
 const iconoClima = c => {
