@@ -115,13 +115,13 @@
     "icono": "🌐"
   },
   {
-    "nombre": "Copilot",
-    "url": "https://copilot.microsoft.com/",
+    "nombre": "Gemini",
+    "url": "https://gemini.google.com/app",
     "icono": "🌐"
   },
   {
-    "nombre": "Gemini",
-    "url": "https://gemini.google.com/app",
+    "nombre": "Copilot",
+    "url": "https://copilot.microsoft.com/",
     "icono": "🌐"
   }
 ]
