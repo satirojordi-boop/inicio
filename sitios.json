@@ -113,5 +113,10 @@
     "nombre": "perplexi",
     "url": "https://www.perplexity.ai/?login-new=false&login-source=floatingSignup",
     "icono": "🌐"
+  },
+  {
+    "nombre": "Copilot",
+    "url": "https://copilot.microsoft.com/",
+    "icono": "🌐"
   }
 ]
