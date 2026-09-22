@@ -108,5 +108,10 @@
     "nombre": "descargar Instagarm",
     "url": "https://sssinstagram.com/es/reels-downloader",
     "icono": "🌐"
+  },
+  {
+    "nombre": "Gemini",
+    "url": "https://gemini.google.com/app",
+    "icono": "🌐"
   }
 ]
