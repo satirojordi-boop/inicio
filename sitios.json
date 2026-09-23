@@ -118,5 +118,10 @@
     "nombre": "Copilot",
     "url": "https://copilot.microsoft.com/",
     "icono": "🌐"
+  },
+  {
+    "nombre": "Descargador YouTube",
+    "url": "http://127.0.0.1:8080",
+    "icono": "📥"
   }
 ]
