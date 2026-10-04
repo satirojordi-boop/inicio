@@ -110,6 +110,11 @@
     "icono": "🌐"
   },
   {
+    "nombre": "Descargador YouTube",
+    "url": "http://127.0.0.1:8080",
+    "icono": "📥"
+  },
+  {
     "nombre": "perplexi",
     "url": "https://www.perplexity.ai/?login-new=false&login-source=floatingSignup",
     "icono": "🌐"
@@ -123,10 +128,5 @@
     "nombre": "Copilot",
     "url": "https://copilot.microsoft.com/",
     "icono": "🌐"
-  },
-  {
-    "nombre": "Descargador YouTube",
-    "url": "http://127.0.0.1:8080",
-    "icono": "📥"
   }
 ]
