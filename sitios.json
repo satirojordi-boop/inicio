@@ -123,5 +123,10 @@
     "nombre": "Copilot",
     "url": "https://copilot.microsoft.com/",
     "icono": "🌐"
+  },
+  {
+    "nombre": "Hermes web",
+    "url": "http://192.168.0.22:9120/?profile=admin#/",
+    "icono": "🌐"
   }
 ]
